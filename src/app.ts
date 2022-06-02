@@ -1,9 +1,18 @@
 import dotenv from "dotenv"
 import express , {Request , Response} from "express" 
+import cors from "cors" 
+import helmet from "helmet" 
+import compression from "compression"
+import Config from "./config"
 
 dotenv.config() 
- 
 const app : express.Application = express()
+
+app.use(express.json()) 
+app.use(cors())
+app.use(compression())
+app.use(helmet())
+
 
 app.get("/" , (req : Request , res : Response) => {
     res.status(200).json({
@@ -11,8 +20,6 @@ app.get("/" , (req : Request , res : Response) => {
         error: ""
     })
 })
-
-
 
 //Top level error 405 handling 
 app.all("/*" , (req : Request , res : Response) => {
@@ -30,6 +37,6 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.listen(process.env.SERVER_PORT || 4000 , () => {
+app.listen(Config.serverPort , () => {
     console.log("Server started ")
 })
