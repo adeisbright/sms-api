@@ -12,6 +12,24 @@ app.get("/" , (req : Request , res : Response) => {
     })
 })
 
+
+
+//Top level error 405 handling 
+app.all("/*" , (req : Request , res : Response) => {
+    res.set("Allow" , "GET ,DELETE")
+    res.status(405).json({
+        message : "Method not allow",
+        error: ""
+    })
+})
+
+//Top level error 404 handling 
+app.use(function(req, res, next) {
+    res.status(404);
+    res.json({status:404,title:"Not Found",msg:"Route not found"});
+    next();
+});
+
 app.listen(process.env.SERVER_PORT || 4000 , () => {
     console.log("Server started ")
 })
