@@ -4,11 +4,14 @@ import cors from "cors"
 import helmet from "helmet" 
 import compression from "compression"
 import Config from "./config"
+import httpLogger from "./common/logging/http-logger";
+import errorHandler from "./middleware/error-handler"
 
 dotenv.config() 
 const app : express.Application = express()
 
 app.use(express.json()) 
+app.use(httpLogger)
 app.use(cors())
 app.use(compression())
 app.use(helmet())
@@ -36,6 +39,8 @@ app.use(function(req, res, next) {
     res.json({status:404,title:"Not Found",msg:"Route not found"});
     next();
 });
+
+app.use(errorHandler)
 
 app.listen(Config.serverPort , () => {
     console.log("Server started ")
