@@ -6,6 +6,7 @@ import compression from "compression"
 import Config from "./config"
 import httpLogger from "./common/logging/http-logger";
 import errorHandler from "./middleware/error-handler"
+import smsRouter from "./features/sms/sms.route"
 
 dotenv.config() 
 const app : express.Application = express()
@@ -23,6 +24,8 @@ app.get("/" , (req : Request , res : Response) => {
         error: ""
     })
 })
+
+app.use(smsRouter)
 
 //Top level error 405 handling 
 app.all("/*" , (req : Request , res : Response) => {

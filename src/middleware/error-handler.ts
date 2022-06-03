@@ -31,12 +31,13 @@ const errorHandler = (
     const resStatusCode = statusCode ? statusCode : 500;
 
     const body  = {
-        message: message,
+        message: "",
         err:  err.message
     };
 
     
     if (err instanceof ApplicationError) {
+        body.message = "error : unknown failure"
         res.status(resStatusCode).json(body);
     } else {
         res.status(resStatusCode).json(body);
