@@ -7,6 +7,7 @@ const smsRouter = Router()
 
 const {
     handleInboundSMS,
+    handleOutboundSMS
 } = smsController
 
 
@@ -16,5 +17,10 @@ smsRouter.post("/inbound/sms" ,
     handleInboundSMS
 )
 
+smsRouter.post("/outbound/sms" , 
+    basicAuthentication, 
+    validateSMSInput,
+    handleOutboundSMS
+)
 
 export default smsRouter
