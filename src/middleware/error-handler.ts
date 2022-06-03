@@ -32,7 +32,7 @@ const errorHandler = (
 
     const body  = {
         message: "",
-        err:  err.message
+        error:  err.message
     };
 
     

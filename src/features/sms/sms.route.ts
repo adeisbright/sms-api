@@ -7,7 +7,8 @@ const smsRouter = Router()
 
 const {
     handleInboundSMS,
-    handleOutboundSMS
+    handleOutboundSMS,
+    handleMethodNotAllowed
 } = smsController
 
 
@@ -22,5 +23,7 @@ smsRouter.post("/outbound/sms" ,
     validateSMSInput,
     handleOutboundSMS
 )
+
+smsRouter.all("/inbound|outbound/sms" ,handleMethodNotAllowed)
 
 export default smsRouter

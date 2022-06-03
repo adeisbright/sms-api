@@ -64,7 +64,7 @@ class SMSController {
             if (phoneNumber == null){
                 return next(new NotFoundError("from parameter not found"))
             }
-            
+
             const cachedKey = `${to}:${from}`
             if (await tedis.get(cachedKey)){
                 return next(new BadRequestError(
@@ -78,6 +78,21 @@ class SMSController {
             })
         }catch(error : any){
             return next(new ApplicationError(error.message))
+        }
+    }
+
+    async handleMethodNotAllowed(
+        req : Request , 
+        res : Response , 
+        next : NextFunction
+    ){
+        try{
+            res.status(405).json({
+                message : "",
+                err:"This method is not allowed"
+            })
+        }catch(error : any){
+            return next(new ApplicationError("unknown failure"))
         }
     }
 
