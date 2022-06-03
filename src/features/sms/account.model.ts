@@ -6,16 +6,16 @@ const Account = sequelize.define(
 	{
 		id: {
 			type: DataTypes.NUMBER,
-            primaryKey : true,
-            autoIncrement : true
+			primaryKey: true,
+			autoIncrement: true
 		},
 		auth_id: {
 			type: DataTypes.STRING,
-            allowNull : false 
+			allowNull: false
 		},
 		username: {
 			type: DataTypes.STRING,
-            allowNull : false 
+			allowNull: false
 		}
 	},
 	{

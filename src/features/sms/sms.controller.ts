@@ -1,101 +1,91 @@
-import {Request , Response , NextFunction} from "express"
-import ApplicationError from "../../common/error-handler/ApplicationError"
-import BadRequestError from "../../common/error-handler/BadRequestError"
-import NotFoundError from "../../common/error-handler/NotFoundError"
-import tedis from "../../loaders/redis-loader"
-import rateLimiter from "./rate-limiter"
-import SMSRepository from "./SMS.repository"
-import stopTextChecker from "./stop-text-checker"
-
+import { Request, Response, NextFunction } from "express";
+import ApplicationError from "../../common/error-handler/ApplicationError";
+import BadRequestError from "../../common/error-handler/BadRequestError";
+import NotFoundError from "../../common/error-handler/NotFoundError";
+import tedis from "../../loaders/redis-loader";
+import rateLimiter from "./rate-limiter";
+import SMSRepository from "./SMS.repository";
+import stopTextChecker from "./stop-text-checker";
 
 class SMSController {
-    async handleInboundSMS(
-        req : Request , 
-        res : Response , 
-        next : NextFunction
-    ){
-       
-        try{
-            const account = res.locals.account 
-            const {to , text , from} = req.body
-            const query = {
-                number : to, 
-                account_id : account.id
-            }
+	async handleInboundSMS(req: Request, res: Response, next: NextFunction) {
+		try {
+			const account = res.locals.account;
+			const { to, text, from } = req.body;
+			const query = {
+				number: to,
+				account_id: account.id
+			};
 
-            const phoneNumber = await  SMSRepository.getPhoneNumber(query)
-            if (phoneNumber == null){
-                return next(new NotFoundError("to parameter not found"))
-            }
+			const phoneNumber = await SMSRepository.getPhoneNumber(query);
+			if (phoneNumber == null) {
+				return next(new NotFoundError("to parameter not found"));
+			}
 
-            await stopTextChecker(text,from,to)
+			await stopTextChecker(text, from, to);
 
-            res.status(200).json({
-                message:"inbound sms ok",
-                error:""
-            })
-        }catch(error : any){
-            return next(new ApplicationError(error.message))
-        }
-    } 
-    
-    async handleOutboundSMS(
-        req : Request , 
-        res : Response , 
-        next : NextFunction
-    ){
-        try{
+			res.status(200).json({
+				message: "inbound sms ok",
+				error: ""
+			});
+		} catch (error: any) {
+			return next(new ApplicationError(error.message));
+		}
+	}
 
-            const account = res.locals.account 
-            const {to , from} = req.body
-            const query = {
-                number : from, 
-                account_id : account.id
-            }
-            
-            const hasExceedRequest = await rateLimiter(from) 
-            if(hasExceedRequest === -1){
-                return next(new BadRequestError(
-                    `limit reached for from ${from}`
-                 ))
-            }
+	async handleOutboundSMS(req: Request, res: Response, next: NextFunction) {
+		try {
+			const account = res.locals.account;
+			const { to, from } = req.body;
+			const query = {
+				number: from,
+				account_id: account.id
+			};
 
-            const phoneNumber = await SMSRepository.getPhoneNumber(query)
-            if (phoneNumber == null){
-                return next(new NotFoundError("from parameter not found"))
-            }
+			const hasExceedRequest = await rateLimiter(from);
+			if (hasExceedRequest === -1) {
+				return next(
+					new BadRequestError(`limit reached for from ${from}`)
+				);
+			}
 
-            const cachedKey = `${to}:${from}`
-            if (await tedis.get(cachedKey)){
-                return next(new BadRequestError(
-                   `sms from ${from} to ${to} blocked by STOP request`
-                ))
-            }
+			const phoneNumber = await SMSRepository.getPhoneNumber(query);
+			if (phoneNumber == null) {
+				return next(new NotFoundError("from parameter not found"));
+			}
 
-            res.status(200).json({
-                message:"outbound sms ok",
-                error:""
-            })
-        }catch(error : any){
-            return next(new ApplicationError(error.message))
-        }
-    }
+			const cachedKey = `${to}:${from}`;
+			if (await tedis.get(cachedKey)) {
+				return next(
+					new BadRequestError(
+						`sms from ${from} to ${to} blocked by STOP request`
+					)
+				);
+			}
 
-    async handleMethodNotAllowed(
-        req : Request , 
-        res : Response , 
-        next : NextFunction
-    ){
-        try{
-            res.status(405).json({
-                message : "",
-                err:"This method is not allowed"
-            })
-        }catch(error : any){
-            return next(new ApplicationError("unknown failure"))
-        }
-    }
+			res.status(200).json({
+				message: "outbound sms ok",
+				error: ""
+			});
+		} catch (error: any) {
+			return next(new ApplicationError(error.message));
+		}
+	}
 
+	async handleMethodNotAllowed(
+		req: Request,
+		res: Response,
+		next: NextFunction
+	) {
+		try {
+			res.status(405).json({
+				message: "",
+				err: "This method is not allowed"
+			});
+		} catch (error: any) {
+			return next(new ApplicationError("unknown failure"));
+		}
+	}
 }
 
-export default new SMSController()
+export default new SMSController();

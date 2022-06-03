@@ -5,16 +5,16 @@ import { StreamOptions } from "morgan";
 const infoFile = path.join("./", "/logs/http.log");
 
 const streamLogger = winston.createLogger({
-    transports: [
-        new winston.transports.File({
-            filename: infoFile,
-            level: "info"
-        })
-    ]
+	transports: [
+		new winston.transports.File({
+			filename: infoFile,
+			level: "info"
+		})
+	]
 });
 
 const stream: StreamOptions = {
-    write: (message: string) => streamLogger.info(message)
+	write: (message: string) => streamLogger.info(message)
 };
 
 export default stream;

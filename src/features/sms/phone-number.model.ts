@@ -7,20 +7,20 @@ const PhoneNumber = sequelize.define(
 	{
 		id: {
 			type: DataTypes.NUMBER,
-            primaryKey : true,
-            autoIncrement : true
+			primaryKey: true,
+			autoIncrement: true
 		},
 		account_id: {
 			type: DataTypes.NUMBER,
-			allowNull : false,
-            references : {
-                model : Account , 
-                key : "id"
-            }
+			allowNull: false,
+			references: {
+				model: Account,
+				key: "id"
+			}
 		},
 		number: {
 			type: DataTypes.STRING,
-            allowNull : false 
+			allowNull: false
 		}
 	},
 	{
@@ -30,6 +30,6 @@ const PhoneNumber = sequelize.define(
 	}
 );
 
-Account.hasMany(PhoneNumber) ; 
+Account.hasMany(PhoneNumber);
 
 export default PhoneNumber;
