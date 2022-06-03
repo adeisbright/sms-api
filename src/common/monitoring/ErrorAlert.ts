@@ -17,9 +17,7 @@ class ErrorAlert extends EventEmitter {
     }
 
     sendError() {
-        if (process.env.NODE_ENV === "production") {
-            console.log(`A new ${this.errorType} : ${this.message}`);
-        } else {
+        if (process.env.NODE_ENV !== "production") {
             console.log(`A new ${this.errorType} : ${this.message}`);
         }
     }

@@ -4,14 +4,12 @@ import BadRequestError from "../common/error-handler/BadRequestError";
 import ForbiddenError from "../common/error-handler/ForbiddenError";
 import NotAuthorizeError from "../common/error-handler/NotAuthorizeError";
 import ErrorAlert from "../common/monitoring/ErrorAlert";
-import fileLogger from "../common/logging/file-logger";
+import errorLogger from "../common/logging/error-logger";
+import NotFoundError from "../common/error-handler/NotFoundError";
 
-type ErrorType =
-    | ApplicationError
-    | BadRequestError
-    | NotAuthorizeError
-    | ForbiddenError;
-
+type ErrorType = ApplicationError | BadRequestError | NotAuthorizeError |
+    ForbiddenError  | ForbiddenError | NotFoundError;
+ 
 const errorHandler = (
     err: ErrorType,
     req: Request,
@@ -21,10 +19,10 @@ const errorHandler = (
     const errorAlert = new ErrorAlert(err.message, err.name);
     errorAlert.notify();
     
-    const errorMessage = `${req.ip} : ${req.method} ${req.url} ${err.statusCode} :${err.name} ${err.message} `;
+    const errorMessage = `${req.ip}:${req.method} ${req.url} ${err.statusCode}:${err.name} ${err.message} `;
 
 
-    fileLogger.log({
+    errorLogger.log({
         message: errorMessage,
         level: "error"
     });
@@ -34,13 +32,11 @@ const errorHandler = (
 
     const body  = {
         message: message,
-        statusCode: resStatusCode,
         err:  err.message
     };
 
     
     if (err instanceof ApplicationError) {
-        body.message = "ERROR 500 : INTERNAL SERVER ERROR";
         res.status(resStatusCode).json(body);
     } else {
         res.status(resStatusCode).json(body);

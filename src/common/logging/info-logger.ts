@@ -1,17 +1,17 @@
 import winston from "winston";
 import path from "path";
 
-const errorFile = path.join("./", "/logs/error.log");
+const infoFile = path.join("./", "/logs/info.log");
 
 const { combine, timestamp, prettyPrint } = winston.format;
 
-const fileLogger = winston.createLogger({
+const infoLogger = winston.createLogger({
     level: "info",
     format: combine(timestamp(), prettyPrint()),
     transports: [
-        new winston.transports.File({ filename: errorFile, level: "info" })
+        new winston.transports.File({ filename: infoFile, level: "info" })
     ],
     exitOnError: false
 });
 
-export default fileLogger;
+export default infoLogger;
